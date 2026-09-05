@@ -21,15 +21,16 @@
   },
   "settings": {
     "size": "a5",
-    "font": "serif",
-    "fontSize": 18,
-    "lineHeight": 1.9,
-    "margin": 56,
+    "font": "myeongjo",
+    "fontSize": 14.666666666666666,
+    "lineHeight": 1.75,
+    "margin": 68.03149606299213,
     "theme": "cream",
     "accent": "#b7472d",
     "chapterBreak": true,
     "layout": "single",
-    "spineWidth": 34
+    "spineWidth": 34,
+    "typographyVersion": 2
   },
   "sources": [
     {

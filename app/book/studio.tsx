@@ -31,44 +31,9 @@ import { createBookPatch, createManuscriptDiff } from "./patch";
 import DiffPanel from "./diff-panel";
 import InlineEditor from "./inline-editor";
 
-const sizes = {
-  pocket: { name: "문고판", label: "105 × 148 mm", width: 420, height: 592 },
-  a5: { name: "A5", label: "148 × 210 mm", width: 560, height: 795 },
-  b5: { name: "B5", label: "176 × 250 mm", width: 630, height: 895 },
-  square: { name: "정사각", label: "180 × 180 mm", width: 650, height: 650 },
-};
-const fonts = {
-  serif: { name: "고운바탕", value: '"Gowun Batang", Georgia, serif' },
-  myeongjo: { name: "나눔명조", value: '"Nanum Myeongjo", Georgia, serif' },
-  sans: { name: "프리텐다드", value: "Pretendard, Arial, sans-serif" },
-};
-const defaults = template.settings;
-type Settings = typeof defaults;
+import { sizes, fonts, defaults, validSettings, printPresets, matchingPreset,
+  ptToPx, pxToPt, mmToPx, pxToMm, displayNumber, type Settings } from "./typography";
 const storageKey = "onepage-book-v1";
-function validSettings(value: unknown): Settings {
-  const v =
-    value && typeof value === "object" ? (value as Partial<Settings>) : {};
-  const bounded = (n: unknown, fallback: number, min: number, max: number) =>
-    typeof n === "number" && Number.isFinite(n)
-      ? Math.min(max, Math.max(min, n))
-      : fallback;
-  return {
-    size: v.size && v.size in sizes ? v.size : defaults.size,
-    font: v.font && v.font in fonts ? v.font : defaults.font,
-    fontSize: bounded(v.fontSize, 18, 14, 26),
-    lineHeight: bounded(v.lineHeight, 1.9, 1.3, 2.4),
-    margin: bounded(v.margin, 56, 28, 84),
-    theme: ["cream", "white", "night"].includes(v.theme || "")
-      ? v.theme!
-      : "cream",
-    accent: /^#[0-9a-f]{6}$/i.test(v.accent || "")
-      ? v.accent!
-      : defaults.accent,
-    chapterBreak: typeof v.chapterBreak === "boolean" ? v.chapterBreak : true,
-    layout: v.layout === "spread" ? "spread" : "single",
-    spineWidth: bounded(v.spineWidth, 34, 20, 70),
-  };
-}
 function Icon({
   name,
   size = 19,
@@ -175,6 +140,7 @@ function Slider({
       </span>
       <input
         type="range"
+        aria-label={label}
         min={min}
         max={max}
         step={step}
@@ -593,7 +559,10 @@ export default function BookStudio() {
       {
         version: 1,
         ...settings,
-        paper: { widthMm: paper.label.split(" × ")[0], format: paper.label },
+        paper: { widthMm: paper.widthMm, heightMm: paper.heightMm, format: paper.label },
+        print: { fontSizePt: displayNumber(pxToPt(settings.fontSize)),
+          lineHeightPercent: displayNumber(settings.lineHeight * 100),
+          marginMm: displayNumber(pxToMm(settings.margin)) },
       },
       null,
       2,
@@ -1173,6 +1142,24 @@ export default function BookStudio() {
                 className="book-panel-body"
               >
                 <div className="book-control-group">
+                  <h3>종이책 추천 설정</h3>
+                  <label className="book-field">
+                    <span>책의 성격</span>
+                    <select value={matchingPreset(settings)} onChange={(e) => {
+                      const preset = printPresets.find(p => p.id === e.target.value);
+                      if (preset) {
+                        setSettings(current => ({ ...current, ...preset.values, typographyVersion: 2 }));
+                        toast(`${preset.name} 설정을 적용했습니다.`);
+                      }
+                    }}>
+                      <option value="custom" disabled>직접 조정한 설정</option>
+                      {printPresets.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </select>
+                  </label>
+                  <p className="book-control-note">
+                    {printPresets.find(p => p.id === matchingPreset(settings))?.description || "서체, 글자 크기와 여백을 직접 조정한 상태입니다."}
+                  </p>
+                  <p className="book-control-note">추천값을 적용한 뒤 책의 분량과 독자에 맞게 조정하세요.</p>
                   <h3>읽기 방식</h3>
                   <label className="book-field">
                     <span>페이지 보기</span>
@@ -1226,11 +1213,12 @@ export default function BookStudio() {
                   </div>
                   <Slider
                     label="페이지 여백"
-                    value={settings.margin}
-                    min={28}
-                    max={84}
-                    suffix=" px"
-                    onChange={(v) => update("margin", v)}
+                    value={displayNumber(pxToMm(settings.margin))}
+                    min={8}
+                    max={30}
+                    step={0.5}
+                    suffix=" mm"
+                    onChange={(v) => update("margin", mmToPx(v))}
                   />
                 </div>
                 <div className="book-control-group">
@@ -1250,27 +1238,28 @@ export default function BookStudio() {
                   </label>
                   <Slider
                     label="글자 크기"
-                    value={settings.fontSize}
-                    min={14}
-                    max={26}
-                    suffix=" px"
-                    onChange={(v) => update("fontSize", v)}
+                    value={displayNumber(pxToPt(settings.fontSize))}
+                    min={9}
+                    max={20}
+                    step={0.5}
+                    suffix=" pt"
+                    onChange={(v) => update("fontSize", ptToPx(v))}
                   />
                   <Slider
                     label="줄간격"
-                    value={settings.lineHeight}
-                    min={1.3}
-                    max={2.4}
-                    step={0.1}
-                    suffix=" 배"
-                    onChange={(v) => update("lineHeight", v)}
+                    value={displayNumber(settings.lineHeight * 100)}
+                    min={130}
+                    max={240}
+                    step={5}
+                    suffix="%"
+                    onChange={(v) => update("lineHeight", v / 100)}
                   />
                   <div
                     className="book-type-preview"
                     style={{
                       fontFamily:
                         fonts[settings.font as keyof typeof fonts].value,
-                      fontSize: settings.fontSize,
+                      fontSize: Math.max(56 / 3, settings.fontSize),
                       lineHeight: settings.lineHeight,
                     }}
                   >
@@ -1280,6 +1269,7 @@ export default function BookStudio() {
                   </div>
                 </div>
                 <div className="book-control-group">
+                  <p className="book-control-note">pt와 mm는 종이 기준입니다. 화면은 크기에 맞춰 축소되며, 위 서체 미리보기는 읽기 쉽게 확대합니다. 이 미리보기는 인쇄용 PDF가 아닙니다.</p>
                   <h3>페이지와 표지</h3>
                   <Slider
                     label="책등 너비 (겉장 미리보기)"
@@ -1407,7 +1397,7 @@ export default function BookStudio() {
               </button>
               <span>
                 {paper.name} · {fonts[settings.font as keyof typeof fonts].name}{" "}
-                · {settings.fontSize}px
+                · {displayNumber(pxToPt(settings.fontSize))}pt
               </span>
             </div>
           </aside>
