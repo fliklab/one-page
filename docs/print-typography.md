@@ -21,7 +21,7 @@
 - [Adobe Source Han Serif 소개](https://source.typekit.com/source-han-serif/): 인쇄와 화면 용도를 함께 소개하는 오픈소스 명조 계열.
 - [Adobe의 Source Han Serif / Noto Serif CJK 개발 설명](https://ccjktype.fonts.adobe.com/2017/04/source-han-serif-history-development.html): 두 이름으로 배포되는 서체 계열의 배경.
 
-KoPub바탕과 상용 명조체도 출판 편집에서 검토할 수 있지만, 웹 임베딩 조건을 확인하지 않은 폰트 파일을 템플릿에 추가하지 않았습니다. 인쇄용 서체 선택과 웹 서비스 재배포 권한은 구분해야 합니다.
+KoPub World 바탕·돋움을 기기 설치형 선택 항목으로 제공합니다. 사용 조건 조사와 적용 범위는 [KoPub 사용 안내](kopub.md)를 참고하세요.
 
 ## 크기, 행간, 여백
 

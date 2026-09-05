@@ -143,3 +143,5 @@ Next.js, React, Fumadocs, unified/remark, jsdiff로 만들었습니다. 그래�
 ---
 
 **English:** One Page is an MIT-licensed, single-book website template. Use this template, run `npm ci && npm run dev`, and replace `content/book.json` with your own book. It includes a paginated reader, facing-page and jacket views, a Fumadocs editor, a source graph, and downloadable Git-compatible patches. Browser edits are local; commit changes to the snapshot and redeploy to publish them. Direct GitHub patch application is planned, not implemented.
+
+KoPub World 바탕·돋움은 기기에 설치된 서체를 사용하는 옵션입니다. 폰트 파일을 재배포하지 않으며, 미설치 시 대체 서체와 상태 안내를 표시합니다. [사용 조건과 설치 안내](docs/kopub.md)를 참고하세요.

@@ -21,6 +21,8 @@ export const sizes = {
   square: paper("정사각", 180, 180),
 };
 export const fonts = {
+  kopubBatang: { name: "KoPub World 바탕 · 기기 설치", value: '"One Page KoPub Batang", "Nanum Myeongjo", Georgia, serif' },
+  kopubDotum: { name: "KoPub World 돋움 · 기기 설치", value: '"One Page KoPub Dotum", "Noto Sans KR", Arial, sans-serif' },
   myeongjo: { name: "나눔명조", value: '\"Nanum Myeongjo\", Georgia, serif' },
   notoSerif: { name: "Noto Serif KR · 본명조 계열", value: '\"Noto Serif KR\", Georgia, serif' },
   notoSans: { name: "Noto Sans KR · 본고딕 계열", value: '\"Noto Sans KR\", Arial, sans-serif' },

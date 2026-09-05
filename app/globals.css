@@ -7,3 +7,11 @@
 html { scroll-behavior: smooth; }
 body { margin: 0; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Local font lookup only: no KoPub font binaries are redistributed. */
+@font-face { font-family: "One Page KoPub Batang"; src: local("KoPubWorldBatang Light"), local("KoPubWorldBatangLight"), local("KoPubWorld바탕체 Light"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "One Page KoPub Batang"; src: local("KoPubWorldBatang Medium"), local("KoPubWorldBatangMedium"), local("KoPubWorld바탕체 Medium"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "One Page KoPub Batang"; src: local("KoPubWorldBatang Bold"), local("KoPubWorldBatangBold"), local("KoPubWorld바탕체 Bold"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "One Page KoPub Dotum"; src: local("KoPubWorldDotum Light"), local("KoPubWorldDotumLight"), local("KoPubWorld돋움체 Light"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "One Page KoPub Dotum"; src: local("KoPubWorldDotum Medium"), local("KoPubWorldDotumMedium"), local("KoPubWorld돋움체 Medium"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "One Page KoPub Dotum"; src: local("KoPubWorldDotum Bold"), local("KoPubWorldDotumBold"), local("KoPubWorld돋움체 Bold"); font-weight: 700; font-style: normal; font-display: swap; }

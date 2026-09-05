@@ -30,6 +30,7 @@ import template from "../../content/book.json";
 import { createBookPatch, createManuscriptDiff } from "./patch";
 import DiffPanel from "./diff-panel";
 import InlineEditor from "./inline-editor";
+import KoPubStatus from "./kopub-status";
 
 import { sizes, fonts, defaults, validSettings, printPresets, matchingPreset,
   ptToPx, pxToPt, mmToPx, pxToMm, displayNumber, type Settings } from "./typography";
@@ -1236,6 +1237,7 @@ export default function BookStudio() {
                       ))}
                     </select>
                   </label>
+                  <KoPubStatus font={settings.font} />
                   <Slider
                     label="글자 크기"
                     value={displayNumber(pxToPt(settings.fontSize))}
