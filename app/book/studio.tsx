@@ -29,6 +29,7 @@ import { BookFace, BookPartsEditor, JacketPreview } from "./parts";
 import template from "../../content/book.json";
 import { createBookPatch, createManuscriptDiff } from "./patch";
 import DiffPanel from "./diff-panel";
+import InlineEditor from "./inline-editor";
 
 const sizes = {
   pocket: { name: "문고판", label: "105 × 148 mm", width: 420, height: 592 },
@@ -729,7 +730,7 @@ export default function BookStudio() {
             <div className="book-editor-toolbar">
               <span>
                 <i />
-                {saveState}
+                {draft !== book.source ? "수정 중 · 적용 전" : saveState}
               </span>
               <div>
                 <button
@@ -741,11 +742,12 @@ export default function BookStudio() {
                 </button>
                 <button
                   className="book-mode-button"
-                  aria-expanded={showSource}
+                  aria-pressed={showSource}
+                  aria-controls="book-editable-document"
                   onClick={() => setShowSource((v) => !v)}
                 >
                   <Icon name="edit" />
-                  {showSource ? "원문 닫기" : "원문 편집"}
+                  {showSource ? "편집 마치기" : "원문 편집"}
                 </button>
                 <button className="book-apply-button" onClick={applyEdits}>
                   적용하기
@@ -795,30 +797,13 @@ export default function BookStudio() {
                 setJacket(true);
               }}
             />
-            <div
-              className={`book-editor-columns ${showSource ? "with-source" : ""}`}
-            >
-              {showSource && (
-                <section className="book-source-editor">
-                  <div>
-                    <strong>{book.format === "md" ? "Markdown" : "MDX"}</strong>
-                    <span className="book-draft-status">
-                      {draft === book.source
-                        ? "적용된 원고"
-                        : "수정 중 · 상단에서 적용하기"}
-                    </span>
-                  </div>
-                  <textarea
-                    aria-label="책 원고"
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    spellCheck={false}
-                  />
-                  <p className={draftParsed.error ? "book-error" : ""}>
-                    {draftParsed.error ||
-                      "Chapter · Section · Callout · Figure 지원. 문자열 속성을 사용하세요."}
-                  </p>
-                </section>
+            <div className="book-editor-columns">
+              {(showSource || draft !== book.source) && (
+                <p className="book-inline-status" role="status">
+                  {draftParsed.error || (showSource
+                    ? "본문을 클릭해 바로 수정하세요. 수정한 내용은 상단의 적용하기로 반영합니다."
+                    : "수정한 내용이 있습니다. 적용하기를 눌러 책에 반영하세요.")}
+                </p>
               )}
               <DocsBody>
                 <div className="book-doc-title">
@@ -828,7 +813,11 @@ export default function BookStudio() {
                     {book.author} · {book.publisher} · {book.year}
                   </span>
                 </div>
-                <div className="book-prose book-document">{content}</div>
+                <div id="book-editable-document" className="book-prose book-document" data-editing={showSource}>
+                  {showSource ? (
+                    <InlineEditor key={book.source + book.format} source={draft} format={book.format} onChange={setDraft} />
+                  ) : renderBook(draftParsed.tree)}
+                </div>
               </DocsBody>
             </div>
           </DocsPage>

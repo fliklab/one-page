@@ -20,10 +20,15 @@ export type AstNode = {
   ordered?: boolean;
   start?: number;
   children?: AstNode[];
-  attributes?: { type: string; name?: string; value?: unknown }[];
+  attributes?: { type: string; name?: string; value?: unknown; position?: SourcePosition }[];
   identifier?: string;
-  position?: { start: { line: number } };
+  position?: SourcePosition;
 };
+export type SourcePosition = {
+  start: { line: number; offset?: number };
+  end?: { line: number; offset?: number };
+};
+export type TextEditor = (value: string, position: SourcePosition | undefined, attribute?: string) => ReactNode;
 export function plain(node: AstNode): string {
   return node.value ?? node.children?.map(plain).join("") ?? "";
 }
@@ -57,7 +62,7 @@ export function Callout({
   title,
 }: {
   children?: ReactNode;
-  title?: string;
+  title?: ReactNode;
 }) {
   return (
     <aside className="book-callout">
@@ -73,13 +78,13 @@ export function Figure({
 }: {
   src: string;
   alt?: string;
-  caption?: string;
+  caption?: ReactNode;
 }) {
   const url = safeUrl(src, true);
   return (
     <figure>
       {url ? (
-        <img src={url} alt={alt || caption || "참고 이미지"} />
+        <img src={url} alt={alt || (typeof caption === "string" ? caption : "참고 이미지")} />
       ) : (
         <p>이미지 주소를 확인해 주세요.</p>
       )}
@@ -162,9 +167,10 @@ export function renderBook(
   node: AstNode,
   key = "root",
   idPrefix = "",
+  editText?: TextEditor,
 ): ReactNode {
   const children = node.children?.map((n, i) =>
-    renderBook(n, `${key}-${i}`, idPrefix),
+    renderBook(n, `${key}-${i}`, idPrefix, editText),
   );
   const props = { "data-block": key };
   switch (node.type) {
@@ -173,7 +179,7 @@ export function renderBook(
     case "definition":
       return null;
     case "text":
-      return node.value;
+      return editText ? editText(node.value || "", node.position) : node.value;
     case "paragraph":
       return (
         <p key={key} {...props}>
@@ -229,6 +235,7 @@ export function renderBook(
           href={safeUrl(node.url || "")}
           target="_blank"
           rel="noreferrer"
+          onClick={editText ? (event) => event.preventDefault() : undefined}
         >
           {children}
         </a>
@@ -259,7 +266,13 @@ export function renderBook(
       );
       const headingChildren = node.children
         ?.flatMap((n) => (n.type === "paragraph" ? n.children || [] : [n]))
-        .map((n, i) => renderBook(n, `${key}-heading-${i}`, idPrefix));
+        .map((n, i) => renderBook(n, `${key}-heading-${i}`, idPrefix, editText));
+      const editableAttribute = (name: string) => {
+        const attribute = node.attributes?.find((a) => a.name === name);
+        return editText && attribute && typeof attribute.value === "string"
+          ? editText(attribute.value, attribute.position, name)
+          : attributes[name];
+      };
       if (node.name === "Chapter")
         return (
           <Chapter key={key} id={idPrefix + node.identifier}>
@@ -274,7 +287,7 @@ export function renderBook(
         );
       if (node.name === "Callout")
         return (
-          <Callout key={key} title={attributes.title}>
+          <Callout key={key} title={editableAttribute("title")}>
             {children}
           </Callout>
         );
@@ -284,7 +297,7 @@ export function renderBook(
             key={key}
             src={attributes.src || ""}
             alt={attributes.alt}
-            caption={attributes.caption}
+            caption={editableAttribute("caption")}
           />
         );
       return null;
