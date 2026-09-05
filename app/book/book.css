@@ -958,7 +958,62 @@
   display: none;
 }
 .book-editor {
+  --book-muted: #68695f;
   background: var(--book-paper);
+}
+.book-editor[data-theme="night"] {
+  --book-muted: #b0b0a5;
+}
+/* Fumadocs must follow the book palette, independently of the OS theme.
+   Set sidebar tokens locally too: its dark theme defines its own palette. */
+.book-editor,
+.book-editor #nd-sidebar {
+  --color-fd-background: var(--book-paper);
+  --color-fd-foreground: var(--book-ink);
+  --color-fd-muted: var(--book-bg);
+  --color-fd-muted-foreground: var(--book-muted);
+  --color-fd-popover: var(--book-panel);
+  --color-fd-popover-foreground: var(--book-ink);
+  --color-fd-card: var(--book-panel);
+  --color-fd-card-foreground: var(--book-ink);
+  --color-fd-border: var(--book-line);
+  --color-fd-primary: var(--book-ink);
+  --color-fd-primary-foreground: var(--book-paper);
+  --color-fd-secondary: var(--book-bg);
+  --color-fd-secondary-foreground: var(--book-ink);
+  --color-fd-accent: var(--book-bg);
+  --color-fd-accent-foreground: var(--book-ink);
+  --color-fd-ring: var(--book-ink);
+}
+.book-editor input,
+.book-editor textarea,
+.book-editor select {
+  color: var(--book-ink);
+  caret-color: var(--book-ink);
+}
+.book-editor input::placeholder,
+.book-editor textarea::placeholder {
+  color: var(--book-muted);
+  opacity: 1;
+}
+.book-editor .book-mode-button,
+.book-editor .brand-dot,
+.book-editor .book-prose blockquote,
+.book-editor .book-callout > strong,
+.book-editor .book-prose a,
+.book-editor .book-diff-tabs button[aria-pressed="true"],
+.book-editor button:hover:not(:disabled) {
+  color: var(--book-ink);
+}
+.book-editor .book-apply-button {
+  background: var(--book-ink);
+  color: var(--book-paper);
+}
+.book-editor .book-apply-button:hover:not(:disabled) {
+  color: var(--book-paper) !important;
+}
+.book-editor[data-theme="night"] .book-source-editor p.book-error {
+  color: #e59f94;
 }
 .book-editor .book-topbar {
   position: sticky;
@@ -1789,7 +1844,7 @@
 }
 .book-diff-content .added {
   background: #60a96820;
-  color: #367b3d;
+  color: #2e6c35;
 }
 .book-diff-content .removed {
   background: #c7655820;
@@ -1797,7 +1852,7 @@
 }
 .book-diff-content .hunk {
   background: #679db820;
-  color: #49718b;
+  color: #3d637b;
 }
 .book-app[data-theme="night"] .book-diff-content .added {
   color: #9ecc94;
